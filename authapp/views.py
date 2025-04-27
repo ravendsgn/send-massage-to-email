@@ -38,3 +38,29 @@ class AuthView(View):
             code = random.randint(100000, 999999)
             print(f"Verification code for {input_data}: {code}") 
             return JsonResponse({'message': 'Verification code sent to console.'})
+
+
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.decorators import action
+from .models import Card, Order, Like
+from .serializers import CardSerializer, OrderSerializer, LikeSerializer
+
+class CardViewSet(viewsets.ModelViewSet):
+    queryset = Card.objects.all()
+    serializer_class = CardSerializer
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+
+    @action(detail=True, methods=['post'])
+    def qabul_qilish(self, request, pk=None):
+        order = self.get_object()
+        order.status = 'accepted'
+        order.save()
+        return Response({'status': 'Order accepted'})
+
+class LikeViewSet(viewsets.ModelViewSet):
+    queryset = Like.objects.all()
+    serializer_class = LikeSerializer
